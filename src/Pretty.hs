@@ -72,7 +72,7 @@ instance Pretty Lit where
   ppr _ (LBool False) = text "False"
 
 instance Pretty Constraint where
-  ppr p (a, b) = (ppr p a) <+> text " ~ " <+> (ppr p b)
+  ppr p (EqConst a b) = (ppr p a) <+> text " ~ " <+> (ppr p b)
 
 instance Pretty [Constraint] where
   ppr p cs = vcat (punctuate space (map (ppr p) cs))
@@ -87,7 +87,7 @@ instance Show TypeError where
   show (InfiniteType (TV a) b) =
     concat ["Cannot construct the infinite type: ", a, " = ", pptype b]
   show (Ambigious cs) =
-    concat ["Cannot not match expected type: '" ++ pptype a ++ "' with actual type: '" ++ pptype b ++ "'\n" | (a,b) <- cs]
+    concat ["Cannot not match expected type: '" ++ pptype a ++ "' with actual type: '" ++ pptype b ++ "'\n" | (EqConst a b) <- cs]
   show (UnboundVariable a) = "Not in scope: " ++ a
 
 ppscheme :: Scheme -> String

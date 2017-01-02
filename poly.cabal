@@ -21,6 +21,7 @@ executable poly
     , repline       >= 0.1.2.0
 
   other-modules:
+    Assumption
     Env
     Eval
     Infer
