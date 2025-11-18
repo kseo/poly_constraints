@@ -73,7 +73,7 @@ instance Substitutable Scheme where
 instance Substitutable Constraint where
    apply s (EqConst t1 t2) = EqConst (apply s t1) (apply s t2)
    apply s (ExpInstConst t sc) = ExpInstConst (apply s t) (apply s sc)
-   apply s (ImpInstConst t1 ms t2) = ImpInstConst (apply s t1) (apply s ms) (apply s t2)
+   apply s (ImpInstConst t1 ms t2) = ExpInstConst (apply s t1) $ generalize (apply s ms) (apply s t2)
 
 instance Substitutable a => Substitutable [a] where
   apply = map . apply
