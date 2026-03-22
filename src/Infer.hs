@@ -6,7 +6,8 @@ module Infer (
   Constraint(..),
   TypeError(..),
   Subst(..),
-  inferTop
+  inferTop,
+  inferExpr
 ) where
 
 import qualified Assumption as As
