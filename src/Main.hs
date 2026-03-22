@@ -10,7 +10,7 @@ import Pretty
 import Eval
 import qualified Env
 
-import Data.Monoid
+import Control.Monad (when)
 import qualified Data.Map as Map
 import qualified Data.Text.Lazy as L
 import qualified Data.Text.Lazy.IO as L
@@ -134,12 +134,12 @@ comp n = do
   let defs = Map.keys ctx
   return $ filter (isPrefixOf n) (cmds ++ defs)
 
-options :: [(String, [String] -> Repl ())]
+options :: Options (HaskelineT (StateT IState IO))
 options = [
-    ("load"   , load)
-  , ("browse" , browse)
+    ("load"   , load . words)
+  , ("browse" , browse . words)
   , ("quit"   , quit)
-  , ("type"   , Main.typeof)
+  , ("type"   , Main.typeof . words)
   ]
 
 -------------------------------------------------------------------------------
@@ -149,9 +149,9 @@ options = [
 completer :: CompleterStyle (StateT IState IO)
 completer = Prefix (wordCompleter comp) defaultMatcher
 
-shell :: Repl a -> IO ()
+shell :: Repl () -> IO ()
 shell pre = flip evalStateT initState
-     $ evalRepl "Poly> " cmd options completer pre
+     $ evalRepl (const $ pure "Poly> ") cmd Main.options (Just ':') Nothing completer pre (pure Exit)
 
 -------------------------------------------------------------------------------
 -- Toplevel

@@ -14,6 +14,7 @@ import Env
 import Type
 import Syntax
 
+import Control.Monad (unless, replicateM)
 import Control.Monad.Except
 import Control.Monad.State
 import Control.Monad.Reader
@@ -50,7 +51,7 @@ data Constraint = EqConst Type Type
                 deriving (Show, Eq, Ord)
 
 newtype Subst = Subst (Map.Map TVar Type)
-  deriving (Eq, Ord, Show, Monoid)
+  deriving (Eq, Ord, Show, Semigroup, Monoid)
 
 
 class Substitutable a where
@@ -187,7 +188,8 @@ infer expr = case expr of
     return (As.singleton x tv, [], tv)
 
   Lam x e -> do
-    tv@(TVar a) <- fresh
+    tv <- fresh
+    let (TVar a) = tv
     (as, cs, t) <- extendMSet a (infer e)
     return ( as `As.remove` x
            , cs ++ [EqConst t' tv | t' <- As.lookup x as]
